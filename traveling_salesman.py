@@ -32,13 +32,23 @@ def initialize_matrix(cities: list) -> List[List[float]]:
         matrix.append(tour)
     return matrix
 
+def calculate_fitness(matrix: List[List[float]], population: List[List[int]]) -> List[float]:
+    fitness = []
+    for i in range(len(population)):
+        curr = 0
+        for j in range(1, len(population[i])):
+            curr += matrix[population[i][j-1]][population[i][j]]
+        curr += matrix[population[i][-1]][population[i][0]]
+        fitness.append(curr)
+    return fitness
 
 def main():
     cities = parse_input_file("input.txt")
     initial_list = list(range(len(cities)))
-    population = initialize_population(initial_list, 160)
+    population = initialize_population(initial_list, 10)
     matrix = initialize_matrix(cities)
-    for arr in matrix:
-        print(arr)
+    fitness = calculate_fitness(matrix, population)
+    print(fitness)
+
 if __name__ == "__main__":
     main()
