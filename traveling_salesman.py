@@ -1,6 +1,7 @@
 from typing import List, Tuple
 from random import shuffle
 import numpy as np
+import random
 #Maps points into a tuple
 points3D = Tuple[float, float, float]
 
@@ -32,6 +33,7 @@ def initialize_matrix(cities: list) -> List[List[float]]:
         matrix.append(tour)
     return matrix
 
+#Calculates fitness according to the scores calculated in the distance matrix
 def calculate_fitness(matrix: List[List[float]], population: List[List[int]]) -> List[float]:
     fitness = []
     for i in range(len(population)):
@@ -42,13 +44,28 @@ def calculate_fitness(matrix: List[List[float]], population: List[List[int]]) ->
         fitness.append(curr)
     return fitness
 
+def choose_parents(population: List[List[int]], fitness: List[float]) -> List[int]:
+    contenders = random.sample(range(len(population)), 5)      # step 1
+    winner_idx = min(contenders, key=lambda i: fitness[i])     # step 2
+    parentA_idx = winner_idx
+    parentA = population[parentA_idx]                          # step 3
+
+    # second parent
+    contenders = random.sample(range(len(population)), 5)      # step 4 (repeat)
+    winner_idx = min(contenders, key=lambda i: fitness[i])
+    parentB_idx = winner_idx
+    parentB = population[parentB_idx]
+    return parentA, parentB
 def main():
     cities = parse_input_file("input.txt")
     initial_list = list(range(len(cities)))
     population = initialize_population(initial_list, 10)
     matrix = initialize_matrix(cities)
     fitness = calculate_fitness(matrix, population)
-    print(fitness)
+
+    #choose 2 parents
+    parentA, parentB = choose_parents(population, fitness)
+
 
 if __name__ == "__main__":
     main()
