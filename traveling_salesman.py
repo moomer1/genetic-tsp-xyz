@@ -1,5 +1,5 @@
 from typing import List, Tuple
-from random import shuffle
+from random import shuffle, choices
 import numpy as np
 import random
 #Maps points into a tuple
@@ -56,6 +56,16 @@ def choose_parents(population: List[List[int]], fitness: List[float]) -> List[in
     parentB_idx = winner_idx
     parentB = population[parentB_idx]
     return parentA, parentB
+
+def single_point_crossover(a: List[int], b: List[int]):
+    if len(a) != len(b):
+        raise ValueError("parentA and parentB not matching")
+    length = len(a)
+    if length < 2:
+        return a, b
+    p = random.randint(1, length - 1)
+    return a[0:p] + b[p:], b[0:p] + a[p:]
+
 def main():
     cities = parse_input_file("input.txt")
     initial_list = list(range(len(cities)))
@@ -65,7 +75,11 @@ def main():
 
     #choose 2 parents
     parentA, parentB = choose_parents(population, fitness)
-
+    
+    print(parentA, parentB)
+    #Crossover genomes from chosen parents
+    childA, childB = single_point_crossover(parentA, parentB)
+    print(childA, childB)
 
 if __name__ == "__main__":
     main()
