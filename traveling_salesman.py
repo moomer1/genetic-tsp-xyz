@@ -66,6 +66,11 @@ def single_point_crossover(a: List[int], b: List[int]):
     p = random.randint(1, length - 1)
     return a[0:p] + b[p:], b[0:p] + a[p:]
 
+def mutation(path: List[int], num: int = 1, probability: float = 0.5) -> List[int]:
+    for _ in range(num):
+        index = random.randrange(len(path))
+        path[index] = path[index] if random.random() > probability else abs(path[index] - 1)
+    return path
 def main():
     cities = parse_input_file("input.txt")
     initial_list = list(range(len(cities)))
@@ -76,10 +81,13 @@ def main():
     #choose 2 parents
     parentA, parentB = choose_parents(population, fitness)
     
-    print(parentA, parentB)
     #Crossover genomes from chosen parents
     childA, childB = single_point_crossover(parentA, parentB)
-    print(childA, childB)
+
+    #Plug paths into a mutation function
+    childA = mutation(childA)
+    childB = mutation(childB)
+
 
 if __name__ == "__main__":
     main()
