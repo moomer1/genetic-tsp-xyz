@@ -2,6 +2,7 @@ from typing import List, Tuple
 from random import shuffle, choices
 import numpy as np
 import random
+import math
 #Maps points into a tuple
 points3D = Tuple[float, float, float]
 
@@ -100,6 +101,35 @@ def write_output(filename: str, best_length: float,
         for idx in best_tour:
             x, y, z = cities[idx]
             f.write(f"{int(x)} {int(y)} {int(z)}\n") 
+        x, y, z = cities[best_tour[0]]
+        f.write(f"{int(x)} {int(y)} {int(z)}\n")
+
+#Reorganizes tour so that it always starts from the starting point
+def canonicalize_tour_by_coords(tour: List[int], cities: List[Tuple[float,float,float]]) -> List[int]:
+    n = len(tour)
+    coords = [cities[i] for i in tour]
+    min_pos = min(range(n), key=lambda k: coords[k])
+    rot = tour[min_pos:] + tour[:min_pos]
+
+    fwd = rot
+    rev = [rot[0]] + list(reversed(rot[1:]))
+
+    f2 = cities[fwd[1]] if n > 1 else (float('inf'),)*3
+    r2 = cities[rev[1]] if n > 1 else (float('inf'),)*3
+    return rev if f2 < r2 else fwd
+
+def path_length_from_coords(cities, tour):
+    total = 0.0
+    for i in range(1, len(tour)):
+        x1,y1,z1 = cities[tour[i-1]]
+        x2,y2,z2 = cities[tour[i]]
+        dx = x1 - x2; dy = y1 - y2; dz = z1 - z2
+        total += math.sqrt(dx*dx + dy*dy + dz*dz)
+    x1,y1,z1 = cities[tour[-1]]
+    x2,y2,z2 = cities[tour[0]]
+    dx = x1 - x2; dy = y1 - y2; dz = z1 - z2
+    total += math.sqrt(dx*dx + dy*dy + dz*dz)
+    return total
 
 def main():
     cities = parse_input_file("input.txt")
@@ -141,8 +171,11 @@ def main():
     # final report
     fitness = calculate_fitness(matrix, population)
     best_idx = min(range(len(population)), key=lambda i: fitness[i])
-    best_length = fitness[best_idx]
-    best_tour = population[best_idx]
+    best_tour = population[best_idx][:]
+
+    best_tour = canonicalize_tour_by_coords(best_tour, cities)
+    best_length = path_length_from_coords(cities, best_tour)
+
 
     write_output("output.txt", best_length, best_tour, cities)
 
