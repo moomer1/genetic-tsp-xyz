@@ -176,7 +176,7 @@ def main():
     best_tour = canonicalize_tour_by_coords(best_tour, cities)
     best_length = path_length_from_coords(cities, best_tour)
 
-
+    print('test')
     write_output("output.txt", best_length, best_tour, cities)
 
 
